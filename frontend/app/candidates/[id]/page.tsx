@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { api, CandidateDetail } from "@/lib/api/client";
 import Link from "next/link";
 import {
-  ArrowLeft, Github, MapPin, Clock, Star, AlertTriangle,
+  ArrowLeft, GitBranch, MapPin, Clock, Star, AlertTriangle,
   CheckCircle, XCircle, Target, TrendingUp, Shield, Zap,
   Brain, MessageSquare, Users, BarChart3, ChevronRight,
   Briefcase, BookOpen
@@ -620,7 +620,7 @@ export default function CandidateDetailPage() {
                 </span>
                 {i.github_activity_score > 0 && (
                   <span className="flex items-center gap-1 text-xs" style={{ color: "var(--success)" }}>
-                    <Github size={11} /> GitHub {i.github_activity_score.toFixed(0)}/100
+                    <GitBranch size={11} /> GitHub {i.github_activity_score.toFixed(0)}/100
                   </span>
                 )}
               </div>

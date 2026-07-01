@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api, CandidateListItem, PaginatedCandidates } from "@/lib/api/client";
 import Link from "next/link";
 import {
-  Search, Filter, Github, MapPin, Clock, TrendingUp,
+  Search, Filter, GitBranch, MapPin, Clock, TrendingUp,
   ChevronLeft, ChevronRight, AlertTriangle, Star, Zap
 } from "lucide-react";
 
@@ -113,7 +113,7 @@ function CandidateRow({ candidate }: { candidate: CandidateListItem }) {
               </span>
               {candidate.github_activity_score > 0 && (
                 <span className="flex items-center gap-1 text-xs" style={{ color: "var(--success)" }}>
-                  <Github size={11} />
+                  <GitBranch size={11} />
                   {candidate.github_activity_score.toFixed(0)}/100
                 </span>
               )}

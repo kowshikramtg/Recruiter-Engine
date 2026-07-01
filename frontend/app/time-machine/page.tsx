@@ -63,8 +63,8 @@ export default function TimeMachinePage() {
           <div
             key={p.id}
             onClick={() => setSelected(p.id)}
-            className={`card p-5 cursor-pointer transition-all duration-200 ${selected === p.id ? "ring-2" : "hover:border-white/20"}`}
-            style={selected === p.id ? { ringColor: p.color, borderColor: `${p.color}60` } : {}}
+            className={`card p-5 cursor-pointer transition-all duration-200 ${selected === p.id ? "" : "hover:border-white/20"}`}
+            style={selected === p.id ? { outline: `2px solid ${p.color}`, borderColor: `${p.color}60` } : {}}
           >
             <div className="flex items-start gap-3">
               <div className="w-3 h-3 rounded-full mt-1 shrink-0" style={{ background: p.color }} />
