@@ -1,0 +1,58 @@
+"""
+submission_metadata.yaml — Required competition metadata file.
+"""
+team_name: "Hiring Intelligence Engine"
+submission_version: "1.0.0"
+
+# Entry point for ranking (no network, CPU only, < 5 min)
+rank_script: "rank.py"
+rank_command: "python rank.py --candidates {candidates_path} --out submission.csv"
+
+# Pre-computation (run separately, can use network and LLMs)
+precompute_script: "precompute.py"
+precompute_command: "python precompute.py --candidates {candidates_path}"
+
+# Constraints compliance
+has_network_during_ranking: false
+uses_gpu: false
+max_runtime_minutes: 5
+max_ram_gb: 16
+
+# Model used during pre-computation (NOT used at ranking time)
+offline_models:
+  - name: "all-MiniLM-L6-v2"
+    type: "sentence_transformer"
+    size_mb: 22
+    used_at: "precompute_only"
+
+# Approach summary
+approach: |
+  Two-system architecture:
+  1. Offline Pre-computation (precompute.py): 
+     - Role DNA extraction from JD (rule-based + optional LLM)
+     - Candidate intelligence extraction from 100K profiles (pure Python)
+     - Semantic alignment via local sentence-transformers (all-MiniLM-L6-v2)
+     - Evidence validation + honeypot detection
+     - Full 10-module AI pipeline scored and stored in SQLite
+  
+  2. Online Ranking (rank.py, no network):
+     - Load precomputed scores from SQLite (O(1) per candidate)
+     - Sort by final_score descending
+     - Generate reasoning from precomputed facts (template-based)
+     - Output submission.csv with top 100
+
+# Key design decisions
+design_decisions:
+  - "Career trajectory and title/company signals prioritized over keyword matching (per JD guidance)"
+  - "Services-firm-only candidates penalized 40% (score × 0.60)"
+  - "Honeypots detected via consistency math: expert×N skills × 0 months = flagged"
+  - "Semantic alignment used as soft signal (10%) not primary signal"
+  - "Behavioral signals (availability, engagement, notice period) weighted 18%"
+  - "NDCG@10 optimization: high-weight signals ensure top-10 are genuinely strong"
+
+# Evaluation metric targets
+target_metrics:
+  ndcg_at_10: "Primary — 50% of score"
+  ndcg_at_50: "Secondary — 30% of score"
+  map: "15% of score"
+  precision_at_10: "5% of score"

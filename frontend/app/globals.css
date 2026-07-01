@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+:root {
+  --background: #070B14;
+  --surface: #0D1424;
+  --surface-2: #111827;
+  --border: rgba(99, 102, 241, 0.15);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+
+  --primary: #6366F1;
+  --primary-light: #818CF8;
+  --primary-dark: #4F46E5;
+
+  --success: #10B981;
+  --success-dim: rgba(16, 185, 129, 0.15);
+
+  --warning: #F59E0B;
+  --warning-dim: rgba(245, 158, 11, 0.15);
+
+  --danger: #F43F5E;
+  --danger-dim: rgba(244, 63, 94, 0.15);
+
+  --info: #38BDF8;
+  --info-dim: rgba(56, 189, 248, 0.15);
+
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #475569;
+
+  /* Risk level colors */
+  --risk-low: #10B981;
+  --risk-medium: #F59E0B;
+  --risk-high: #F97316;
+  --risk-critical: #F43F5E;
+
+  /* Score gradient */
+  --score-high: #10B981;
+  --score-mid: #F59E0B;
+  --score-low: #F43F5E;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+
+/* Glass morphism panel */
+.glass {
+  background: rgba(13, 20, 36, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+/* Card base */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #6366F1 0%, #818CF8 50%, #38BDF8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Score bar */
+.score-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Animated entry */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out both;
+}
+
+/* Rank badge gradients */
+.rank-gold { background: linear-gradient(135deg, #F59E0B, #FCD34D); }
+.rank-silver { background: linear-gradient(135deg, #94A3B8, #CBD5E1); }
+.rank-bronze { background: linear-gradient(135deg, #EA580C, #F97316); }
+.rank-default { background: rgba(99, 102, 241, 0.2); }
+
+/* Tab indicator */
+.tab-active {
+  color: var(--primary-light);
+  border-bottom: 2px solid var(--primary);
+}
+
+/* Stat card hover */
+.stat-card {
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+/* Evidence strength colors */
+.evidence-strong { color: var(--success); }
+.evidence-moderate { color: var(--info); }
+.evidence-weak { color: var(--warning); }
+.evidence-insufficient { color: var(--danger); }
+
+/* Risk level colors */
+.risk-low { color: var(--risk-low); }
+.risk-medium { color: var(--risk-medium); }
+.risk-high { color: var(--risk-high); }
+.risk-critical { color: var(--risk-critical); }
+
+/* Tier badges */
+.tier-easy { background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); }
+.tier-moderate { background: rgba(56, 189, 248, 0.15); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.3); }
+.tier-rare { background: rgba(139, 92, 246, 0.15); color: #A78BFA; border: 1px solid rgba(139, 92, 246, 0.3); }
+.tier-critical { background: rgba(244, 63, 94, 0.15); color: #F87171; border: 1px solid rgba(244, 63, 94, 0.3); }

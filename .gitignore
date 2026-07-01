@@ -1,0 +1,61 @@
+# Dataset - NEVER commit
+Dataset/
+*.jsonl
+*.jsonl.gz
+*.gz
+
+# Precomputed artifacts (large binary files)
+ai/pipeline/precomputed_features.db
+ai/semantic_alignment/embeddings_cache.npy
+ai/candidate_intelligence/profiles_cache.db
+*.db
+*.npy
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node / Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+__MACOSX/
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temp
+*.tmp
+docs_content.txt
+submission_spec_content.txt
+
+# Submission (commit separately when ready)
+# submission.csv
