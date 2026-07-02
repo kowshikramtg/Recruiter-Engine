@@ -106,7 +106,7 @@ def main():
         limit=args.limit,
     )
 
-    print(f"\n✓ Pre-computation complete!")
+    print(f"\n[OK] Pre-computation complete!")
     print(f"  Candidates: {stats['total']:,}")
     print(f"  Honeypots: {stats['honeypots']}")
     print(f"  Runtime: {stats['elapsed_seconds']:.1f}s")

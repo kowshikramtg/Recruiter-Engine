@@ -17,7 +17,7 @@ from typing import Any, Iterator
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from shared.types import CandidateAnalysis, RoleDNA
+from shared.types import CandidateAnalysis, RoleDNA, AlignmentScores
 from ai.candidate_intelligence.engine import extract_candidate_intelligence
 from ai.evidence_validation.engine import build_evidence_report
 from ai.scorecard.engine import build_scorecard
@@ -25,6 +25,54 @@ from ai.risk_radar.engine import build_risk_radar
 from ai.recruitability.engine import build_recruitability_index
 from ai.opportunity_cost.engine import build_opportunity_cost
 from ai.explainability.engine import build_explainability_report, build_one_line_reasoning
+
+
+def _rule_based_alignment(intel) -> AlignmentScores:
+    """
+    Fast rule-based alignment when sentence_transformers is not available.
+    Uses skill presence, title match, and YOE range as proxies.
+    """
+    scores = AlignmentScores(candidate_id=intel.candidate_id)
+
+    # Technical alignment: scale by AI skill depth
+    scores.technical_alignment = min(intel.ai_skill_depth_score * 0.8, 80.0)
+    # Domain alignment: title match + production evidence
+    scores.domain_alignment = intel.title_alignment_score * 0.6 + (
+        20.0 if intel.has_production_ml_evidence else 0.0
+    )
+    # Experience alignment: YOE in range
+    yoe = intel.years_of_experience
+    if 5 <= yoe <= 9:
+        scores.experience_alignment = 75.0
+    elif 4 <= yoe < 5 or 9 < yoe <= 12:
+        scores.experience_alignment = 55.0
+    elif yoe < 4:
+        scores.experience_alignment = 30.0
+    else:
+        scores.experience_alignment = 40.0
+    # Leadership alignment
+    scores.leadership_alignment = 60.0 if intel.has_leadership_evidence else 30.0
+    # Growth alignment: product company + github
+    scores.growth_alignment = (
+        intel.product_company_ratio * 50.0 +
+        (min(intel.github_activity_score, 100.0) * 0.3 if intel.github_activity_score > 0 else 0.0)
+    )
+    # Communication alignment
+    scores.communication_alignment = 50.0 + (20.0 if intel.github_activity_score > 0 else 0.0)
+    # Adaptability alignment
+    scores.adaptability_alignment = 40.0 + intel.product_company_ratio * 40.0
+    # Overall (weighted)
+    scores.overall_alignment = (
+        0.30 * scores.technical_alignment +
+        0.20 * scores.domain_alignment +
+        0.20 * scores.experience_alignment +
+        0.10 * scores.leadership_alignment +
+        0.10 * scores.growth_alignment +
+        0.05 * scores.communication_alignment +
+        0.05 * scores.adaptability_alignment
+    )
+    scores.semantic_similarity = scores.overall_alignment
+    return scores
 
 
 DB_SCHEMA = """
@@ -88,23 +136,25 @@ def iter_candidates(jsonl_path: str, limit: int = None) -> Iterator[dict]:
                 break
 
 
-def _to_json_safe(obj) -> str:
-    """Convert dataclass to JSON-safe dict."""
-    if hasattr(obj, "__dict__"):
-        d = {}
-        for k, v in obj.__dict__.items():
-            if hasattr(v, "__dict__"):
-                d[k] = _to_json_safe(v)
-            elif isinstance(v, list):
-                d[k] = [_to_json_safe(i) if hasattr(i, "__dict__") else i for i in v]
-            elif hasattr(v, "value"):
-                d[k] = v.value
-            else:
-                d[k] = v
-        return d
-    elif hasattr(obj, "value"):
+def _to_json_safe(obj):
+    """Convert dataclass/enum/list/dict to JSON-safe primitives. Non-recursive for enums."""
+    from enum import Enum
+    import dataclasses
+
+    if obj is None or isinstance(obj, (bool, int, float, str)):
+        return obj
+    if isinstance(obj, Enum):
         return obj.value
-    return obj
+    if isinstance(obj, list):
+        return [_to_json_safe(i) for i in obj]
+    if isinstance(obj, dict):
+        return {k: _to_json_safe(v) for k, v in obj.items()}
+    if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
+        return {k: _to_json_safe(v) for k, v in dataclasses.asdict(obj).items()}
+    if hasattr(obj, "__dict__"):
+        return {k: _to_json_safe(v) for k, v in obj.__dict__.items()
+                if not k.startswith("_")}
+    return str(obj)
 
 
 def process_single_candidate(
@@ -178,7 +228,7 @@ def save_analysis_to_db(conn: sqlite3.Connection, analysis: CandidateAnalysis) -
 
     conn.execute(
         """INSERT OR REPLACE INTO candidate_scores VALUES (
-            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
         )""",
         (
             analysis.candidate_id,
@@ -279,8 +329,11 @@ def run_pipeline(
             alignment = alignment_map.get(intel.candidate_id)
 
             if alignment is None:
-                from ai.semantic_alignment.engine import compute_semantic_alignment
-                alignment = compute_semantic_alignment(intel)
+                if use_semantic:
+                    from ai.semantic_alignment.engine import compute_semantic_alignment
+                    alignment = compute_semantic_alignment(intel)
+                else:
+                    alignment = _rule_based_alignment(intel)
 
             from ai.evidence_validation.engine import build_evidence_report
             evidence = build_evidence_report(intel, raw, role_dna)

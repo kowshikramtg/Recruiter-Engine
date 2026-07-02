@@ -15,7 +15,10 @@ from fastapi.middleware.cors import CORSMiddleware
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from backend.routers.routers import candidates_router, dashboard_router, jobs_router
+from backend.routers.routers import (
+    candidates_router, dashboard_router, jobs_router,
+    time_machine_router, compare_router
+)
 
 CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:3000").split(",")
 
@@ -64,6 +67,8 @@ app.add_middleware(
 app.include_router(candidates_router)
 app.include_router(dashboard_router)
 app.include_router(jobs_router)
+app.include_router(time_machine_router)
+app.include_router(compare_router)
 
 
 @app.get("/health")

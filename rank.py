@@ -242,7 +242,7 @@ def generate_submission(
         writer.writerows(ranked)
 
     elapsed = time.time() - t_start
-    print(f"\n[rank.py] ✓ Submission generated in {elapsed:.1f}s")
+    print(f"\n[rank.py] Submission generated in {elapsed:.1f}s")
     print(f"[rank.py] Output: {out_path}")
     print(f"[rank.py] Top 5 candidates:")
     for r in ranked[:5]:

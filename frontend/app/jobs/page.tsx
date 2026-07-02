@@ -2,7 +2,57 @@
 
 import { useEffect, useState } from "react";
 import { api, RoleDNA } from "@/lib/api/client";
-import { Briefcase, CheckCircle, XCircle, Star, Target, Users, Clock, AlertTriangle } from "lucide-react";
+import {
+  Briefcase, CheckCircle, XCircle, Target, Brain, Users,
+  Clock, Shield, Star, Code, MessageSquare, TrendingUp, AlertTriangle
+} from "lucide-react";
+
+function SkillBadge({ skill, variant = "default" }: { skill: string; variant?: "must" | "preferred" | "trainable" | "default" }) {
+  const styles: Record<string, React.CSSProperties> = {
+    must: { background: "rgba(99,102,241,0.15)", color: "#818CF8", border: "1px solid rgba(99,102,241,0.35)" },
+    preferred: { background: "rgba(16,185,129,0.12)", color: "#10B981", border: "1px solid rgba(16,185,129,0.3)" },
+    trainable: { background: "rgba(245,158,11,0.12)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.3)" },
+    default: { background: "rgba(100,116,139,0.12)", color: "#94A3B8", border: "1px solid rgba(100,116,139,0.2)" },
+  };
+  return (
+    <span className="text-[11px] px-2.5 py-1 rounded-full font-medium inline-flex items-center gap-1" style={styles[variant]}>
+      {skill}
+    </span>
+  );
+}
+
+function Section({ title, icon: Icon, color, children }: {
+  title: string; icon: React.ElementType; color: string; children: React.ReactNode;
+}) {
+  return (
+    <div className="card p-5 animate-fade-in-up">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${color}20` }}>
+          <Icon size={14} style={{ color }} />
+        </div>
+        <h2 className="text-sm font-semibold text-white">{title}</h2>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function ListItems({ items, icon: Icon, iconColor }: {
+  items: string[];
+  icon: React.ElementType;
+  iconColor: string;
+}) {
+  return (
+    <ul className="space-y-2">
+      {items.map((item, i) => (
+        <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
+          <Icon size={11} className="mt-0.5 shrink-0" style={{ color: iconColor }} />
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default function JobsPage() {
   const [dna, setDna] = useState<RoleDNA | null>(null);
@@ -16,165 +66,188 @@ export default function JobsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="p-8"><div className="card p-8 animate-pulse" style={{ height: 300 }} /></div>;
-  if (error || !dna) return (
-    <div className="p-8"><div className="card p-8 text-center">
-      <AlertTriangle size={32} className="mx-auto mb-3" style={{ color: "var(--warning)" }} />
-      <p className="text-sm">{error || "Failed to load"}</p>
-    </div></div>
-  );
+  if (loading) {
+    return (
+      <div className="p-8 max-w-6xl mx-auto">
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="card p-5 animate-pulse" style={{ height: 140, background: "var(--surface-2)" }} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !dna) {
+    return (
+      <div className="p-8 max-w-6xl mx-auto">
+        <div className="card p-8 text-center">
+          <AlertTriangle size={40} className="mx-auto mb-3" style={{ color: "var(--warning)" }} />
+          <p className="text-sm text-white mb-1">Could not load Role DNA</p>
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            {error || "Backend unavailable. Run uvicorn backend.main:app --reload"}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="mb-6 animate-fade-in-up">
+    <div className="p-8 max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="mb-8 animate-fade-in-up">
         <div className="flex items-center gap-2 mb-1">
           <Briefcase size={18} style={{ color: "var(--primary)" }} />
-          <h1 className="text-3xl font-bold text-white">Role DNA</h1>
+          <span className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--primary)" }}>
+            Role DNA — Extracted Intelligence
+          </span>
         </div>
+        <h1 className="text-3xl font-bold text-white mb-1">{dna.title}</h1>
         <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-          Structured intelligence extracted from the job description — used by all AI modules.
+          {dna.company} · {dna.seniority_level} level · {dna.experience_min_years}–{dna.experience_max_years} years
         </p>
       </div>
 
-      {/* Job header */}
-      <div className="card p-6 mb-6 animate-fade-in-up" style={{ animationDelay: "50ms" }}>
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-white">{dna.title}</h2>
-            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{dna.company}</p>
+      {/* Quick summary bar */}
+      <div className="card p-4 mb-6 animate-fade-in-up" style={{ animationDelay: "50ms" }}>
+        <div className="flex items-center gap-6 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Clock size={13} style={{ color: "var(--primary)" }} />
+            <span className="text-xs text-white font-medium">{dna.experience_min_years}–{dna.experience_max_years}y exp</span>
           </div>
-          <div className="text-right">
-            <p className="text-sm font-medium text-white">{dna.experience_min_years}–{dna.experience_max_years} years</p>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>experience required</p>
+          <div className="flex items-center gap-2">
+            <Target size={13} style={{ color: "var(--success)" }} />
+            <span className="text-xs text-white font-medium">≤{dna.notice_preference_days}d preferred notice (max {dna.notice_max_days}d)</span>
           </div>
-        </div>
-        <div className="flex items-center gap-3 mt-4 flex-wrap">
-          <span className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: "rgba(99,102,241,0.15)", color: "var(--primary-light)", border: "1px solid rgba(99,102,241,0.3)" }}>
-            {dna.seniority_level}
-          </span>
-          <span className="text-xs px-2 py-1 rounded-full" style={{ background: "var(--success-dim)", color: "var(--success)", border: "1px solid rgba(16,185,129,0.3)" }}>
-            Notice ≤ {dna.notice_preference_days}d preferred
-          </span>
-          {dna.requires_production_experience && (
-            <span className="text-xs px-2 py-1 rounded-full" style={{ background: "var(--warning-dim)", color: "var(--warning)", border: "1px solid rgba(245,158,11,0.3)" }}>
-              Production ML Required
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            <CheckCircle size={13} style={{ color: "#10B981" }} />
+            <span className="text-xs font-medium" style={{ color: "#10B981" }}>Production experience required</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Users size={13} style={{ color: "#A78BFA" }} />
+            <span className="text-xs font-medium" style={{ color: "#A78BFA" }}>Product company preferred</span>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Must-have skills */}
-        <div className="card p-5 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
-          <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-            <CheckCircle size={13} style={{ color: "var(--success)" }} /> Must-Have Skills
-          </h3>
-          <ul className="space-y-2">
-            {dna.must_have_skills.map((s, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
-                <CheckCircle size={10} className="mt-0.5 shrink-0" style={{ color: "var(--success)" }} />{s}
-              </li>
+        <Section title="Must-Have Skills" icon={Shield} color="#F43F5E">
+          <div className="flex flex-wrap gap-2">
+            {dna.must_have_skills.map((s) => (
+              <SkillBadge key={s} skill={s} variant="must" />
             ))}
-          </ul>
-        </div>
+          </div>
+        </Section>
 
         {/* Preferred skills */}
-        <div className="card p-5 animate-fade-in-up" style={{ animationDelay: "150ms" }}>
-          <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-            <Star size={13} style={{ color: "var(--warning)" }} /> Preferred Skills
-          </h3>
-          <ul className="space-y-2">
-            {dna.preferred_skills.map((s, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
-                <Star size={10} className="mt-0.5 shrink-0" style={{ color: "var(--warning)" }} />{s}
-              </li>
+        <Section title="Preferred Skills" icon={Star} color="#10B981">
+          <div className="flex flex-wrap gap-2">
+            {dna.preferred_skills.map((s) => (
+              <SkillBadge key={s} skill={s} variant="preferred" />
             ))}
-          </ul>
-        </div>
-
-        {/* Responsibilities */}
-        <div className="card p-5 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-          <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-            <Target size={13} style={{ color: "var(--primary)" }} /> Key Responsibilities
-          </h3>
-          <ul className="space-y-2">
-            {dna.responsibilities.map((r, i) => (
-              <li key={i} className="text-xs flex gap-2" style={{ color: "var(--text-secondary)" }}>
-                <span style={{ color: "var(--primary)" }}>→</span>{r}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Success indicators */}
-        <div className="card p-5 animate-fade-in-up" style={{ animationDelay: "250ms" }}>
-          <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-            <CheckCircle size={13} style={{ color: "var(--info)" }} /> Success Indicators
-          </h3>
-          <ul className="space-y-2">
-            {dna.success_indicators.map((s, i) => (
-              <li key={i} className="text-xs flex gap-2" style={{ color: "var(--text-secondary)" }}>
-                <span style={{ color: "var(--info)" }}>✓</span>{s}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Hidden expectations */}
-        <div className="card p-5 animate-fade-in-up" style={{ animationDelay: "300ms" }}>
-          <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-            <AlertTriangle size={13} style={{ color: "var(--warning)" }} /> Hidden Expectations
-          </h3>
-          <ul className="space-y-2">
-            {dna.hidden_expectations.map((h, i) => (
-              <li key={i} className="text-xs flex gap-2" style={{ color: "var(--text-secondary)" }}>
-                <span style={{ color: "var(--warning)" }}>⚡</span>{h}
-              </li>
-            ))}
-          </ul>
-        </div>
+          </div>
+        </Section>
 
         {/* Technical competencies */}
-        <div className="card p-5 animate-fade-in-up" style={{ animationDelay: "350ms" }}>
-          <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-            <Users size={13} style={{ color: "var(--success)" }} /> Technical Competencies
-          </h3>
-          <ul className="space-y-2">
-            {dna.technical_competencies.map((t, i) => (
-              <li key={i} className="text-xs flex gap-2" style={{ color: "var(--text-secondary)" }}>
-                <span style={{ color: "var(--success)" }}>•</span>{t}
-              </li>
-            ))}
-          </ul>
+        <Section title="Technical Competencies" icon={Code} color="#6366F1">
+          <ListItems
+            items={dna.technical_competencies}
+            icon={CheckCircle}
+            iconColor="var(--primary-light)"
+          />
+        </Section>
+
+        {/* Domain knowledge */}
+        <Section title="Domain Knowledge" icon={Brain} color="#38BDF8">
+          <ListItems
+            items={dna.domain_knowledge}
+            icon={CheckCircle}
+            iconColor="var(--info)"
+          />
+          <div className="mt-3 pt-3 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+            <p className="text-xs mb-2 font-medium" style={{ color: "var(--text-muted)" }}>Trainable (not blocking)</p>
+            <div className="flex flex-wrap gap-2">
+              {dna.trainable_skills.map((s) => (
+                <SkillBadge key={s} skill={s} variant="trainable" />
+              ))}
+            </div>
+          </div>
+        </Section>
+
+        {/* Responsibilities */}
+        <Section title="Key Responsibilities" icon={Target} color="#F59E0B">
+          <ListItems
+            items={dna.responsibilities}
+            icon={CheckCircle}
+            iconColor="var(--warning)"
+          />
+        </Section>
+
+        {/* Success indicators */}
+        <Section title="Success Indicators" icon={TrendingUp} color="#A78BFA">
+          <ListItems
+            items={dna.success_indicators}
+            icon={Star}
+            iconColor="#A78BFA"
+          />
+        </Section>
+
+        {/* Hidden expectations */}
+        <Section title="Hidden Expectations" icon={Brain} color="#F97316">
+          <p className="text-xs mb-3 leading-relaxed" style={{ color: "var(--text-muted)" }}>
+            These are not stated explicitly in the JD but inferred from context and company culture signals.
+          </p>
+          <ListItems
+            items={dna.hidden_expectations}
+            icon={AlertTriangle}
+            iconColor="#F97316"
+          />
+        </Section>
+
+        {/* Cultural signals */}
+        <div className="card p-5 animate-fade-in-up">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(56,189,248,0.15)" }}>
+              <MessageSquare size={14} style={{ color: "var(--info)" }} />
+            </div>
+            <h2 className="text-sm font-semibold text-white">Culture & Communication</h2>
+          </div>
+          <div className="space-y-3">
+            <div className="p-3 rounded-lg" style={{ background: "var(--surface-2)" }}>
+              <p className="text-xs font-medium mb-1" style={{ color: "var(--info)" }}>Leadership Requirements</p>
+              <p className="text-xs" style={{ color: "var(--text-secondary)" }}>{dna.leadership_requirements}</p>
+            </div>
+            <div className="p-3 rounded-lg" style={{ background: "var(--surface-2)" }}>
+              <p className="text-xs font-medium mb-1" style={{ color: "var(--info)" }}>Communication Expectations</p>
+              <p className="text-xs" style={{ color: "var(--text-secondary)" }}>{dna.communication_expectations}</p>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Target titles */}
-      <div className="card p-5 mt-6 animate-fade-in-up" style={{ animationDelay: "400ms" }}>
-        <h3 className="text-sm font-semibold text-white mb-3">Target Titles</h3>
+      <div className="card p-5 mt-6 animate-fade-in-up">
+        <div className="flex items-center gap-2 mb-4">
+          <Briefcase size={14} style={{ color: "var(--primary)" }} />
+          <h2 className="text-sm font-semibold text-white">Target Candidate Titles</h2>
+          <span className="text-xs ml-auto" style={{ color: "var(--text-muted)" }}>{dna.target_titles.length} titles tracked</span>
+        </div>
         <div className="flex flex-wrap gap-2">
-          {dna.target_titles.slice(0, 15).map((t) => (
-            <span key={t} className="text-xs px-2 py-1 rounded-full capitalize"
-              style={{ background: "rgba(99,102,241,0.12)", color: "var(--primary-light)", border: "1px solid rgba(99,102,241,0.25)" }}>
-              {t}
-            </span>
+          {dna.target_titles.slice(0, 20).map((t) => (
+            <SkillBadge key={t} skill={t} variant="default" />
           ))}
         </div>
       </div>
 
-      {/* Trainable skills */}
-      <div className="card p-5 mt-6 animate-fade-in-up" style={{ animationDelay: "450ms" }}>
-        <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-          <Clock size={13} style={{ color: "var(--info)" }} /> Trainable (Nice-to-Have)
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          {dna.trainable_skills.map((s) => (
-            <span key={s} className="text-xs px-2 py-1 rounded-full"
-              style={{ background: "var(--info-dim)", color: "var(--info)", border: "1px solid rgba(56,189,248,0.3)" }}>
-              {s}
-            </span>
-          ))}
-        </div>
+      {/* Scoring note */}
+      <div className="card p-4 mt-6 animate-fade-in-up" style={{ background: "rgba(99,102,241,0.05)", borderColor: "rgba(99,102,241,0.2)" }}>
+        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+          <span style={{ color: "var(--primary-light)" }}>How Role DNA is used: </span>
+          This structured intelligence drives the scoring formula. Must-have skills map to Technical Fit (28% weight).
+          Target titles drive Title Alignment. Hidden expectations inform the Explainability Engine.
+          Services-firm-only background reduces score by 40%.
+        </p>
       </div>
     </div>
   );

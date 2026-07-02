@@ -219,6 +219,24 @@ export interface RoleDNA {
   requires_production_experience: boolean;
 }
 
+export interface SimulationPreset {
+  id: string;
+  name: string;
+  description: string;
+  params: Record<string, unknown>;
+}
+
+export interface SimulationResult {
+  candidate_id: string;
+  original_score: number;
+  simulated_score: number;
+  score_delta: number;
+  name: string;
+  current_title: string;
+  years_of_experience: number;
+  simulated_rank: number;
+}
+
 // ─── Fetch helper ─────────────────────────────────────────────────────────────
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
@@ -261,4 +279,24 @@ export const api = {
 
   // Jobs / Role DNA
   getCurrentJob: () => apiFetch<RoleDNA>("/api/v1/jobs/current"),
+
+  // Time Machine
+  getSimulationPresets: () => apiFetch<SimulationPreset[]>("/api/v1/time-machine/presets"),
+  runSimulation: (scenarioId: string, candidateIds?: string[]) =>
+    apiFetch<{ scenario_id: string; results: SimulationResult[]; total: number }>(
+      "/api/v1/time-machine/simulate",
+      {
+        method: "POST",
+        body: JSON.stringify({ scenario_id: scenarioId, candidate_ids: candidateIds ?? [] }),
+      }
+    ),
+
+  // Compare
+  compareCandidates: (candidateIds: string[]) =>
+    apiFetch<{ candidates: CandidateDetail[] }>("/api/v1/compare/candidates", {
+      method: "POST",
+      body: JSON.stringify({ candidate_ids: candidateIds }),
+    }),
+  getTopForCompare: (limit = 20) =>
+    apiFetch<PaginatedCandidates>(`/api/v1/compare/top?limit=${limit}`),
 };
