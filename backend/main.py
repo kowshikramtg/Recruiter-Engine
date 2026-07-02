@@ -35,9 +35,9 @@ async def lifespan(app: FastAPI):
         conn = sqlite3.connect(db_path)
         count = conn.execute("SELECT COUNT(*) FROM candidate_scores").fetchone()[0]
         conn.close()
-        print(f"✓ Precomputed database loaded: {count:,} candidates")
+        print(f"Precomputed database loaded: {count:,} candidates")
     else:
-        print(f"⚠ Precomputed database not found at {db_path}")
+        print(f"WARNING: Precomputed database not found at {db_path}")
         print("  Run 'python precompute.py' to generate it first.")
         print("  API will return 503 errors until database is available.")
     yield
