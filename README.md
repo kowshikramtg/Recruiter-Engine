@@ -1,6 +1,6 @@
-<p align="center">
-  <font size="6">Hiring Intelligence Engine (HIE)</font>
-</p>
+<h1 align="center">
+  Hiring Intelligence Engine (HIE)
+</h1>
 
 [![Language](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue.svg)](https://www.python.org/)
 [![Framework](https://img.shields.io/badge/framework-FastAPI-success.svg)](https://fastapi.tiangolo.com)
