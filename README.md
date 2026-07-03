@@ -1,4 +1,6 @@
-# 🧠 Hiring Intelligence Engine (HIE)
+<p align="center">
+  <font size="3">Hiring Intelligence Engine (HIE)</font>
+</p>
 
 [![Language](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue.svg)](https://www.python.org/)
 [![Framework](https://img.shields.io/badge/framework-FastAPI-success.svg)](https://fastapi.tiangolo.com)
