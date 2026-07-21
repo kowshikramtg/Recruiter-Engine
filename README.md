@@ -273,6 +273,8 @@ The dataset includes built-in traps to catch standard keyword-matching screeners
 
 ## ⚙️ Installation & Local Setup
 
+``` NOTE: Supported Python versions: 3.10–3.12 (64-bit). Python 3.13 is not yet supported due to ML library compatibility. ```
+
 ### System Prerequisites
 Ensure you have the following installed:
 - Python 3.10 or 3.11
@@ -317,6 +319,19 @@ ROLE_DNA_PATH=./ai/role_dna/role_dna_output.json
 ```
 
 ---
+
+## First-Time Setup
+
+The precomputed intelligence database is intentionally excluded from Git because it is approximately 1.5 GB.
+
+Generate it locally:
+
+```bash
+python precompute.py
+
+
+---
+
 
 ## 📊 Dataset Preprocessing
 

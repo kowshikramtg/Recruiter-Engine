@@ -13,6 +13,17 @@ import sys
 import time
 import zipfile
 from pathlib import Path
+# pyrefly: ignore [missing-import]
+
+if not ((3, 10) <= sys.version_info[:2] <= (3, 12)):
+    raise RuntimeError(
+        "\n"
+        "Unsupported Python version.\n\n"
+        "Hiring Intelligence Engine currently supports Python 3.10–3.12 (64-bit).\n"
+        f"Detected: Python {sys.version_info.major}.{sys.version_info.minor}\n\n"
+        "Please create a Python 3.12 virtual environment and reinstall dependencies.\n"
+    )
+
 from dotenv import load_dotenv
 
 load_dotenv()

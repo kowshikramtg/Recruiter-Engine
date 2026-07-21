@@ -5,14 +5,19 @@ Dataset/
 *.gz
 
 # Precomputed artifacts (large binary files)
+# generated artifacts
 ai/pipeline/precomputed_features.db
 ai/semantic_alignment/embeddings_cache.npy
 ai/candidate_intelligence/profiles_cache.db
+ai/role_dna/role_dna_output.json
 *.db
 *.npy
+*.sqlite
+*.sqlite3
 
 # Python
 __pycache__/
+*.pyc
 *.py[cod]
 *$py.class
 *.so
@@ -36,6 +41,7 @@ frontend/node_modules/
 frontend/.next/
 frontend/out/
 frontend/.env.local
+node_modules/
 
 # IDE
 .vscode/

@@ -211,7 +211,7 @@ def generate_submission(
         scored = raw_results
 
     # Sort by score descending
-    scored.sort(key=lambda x: (-x[1], x[0]))  # Score desc, candidate_id asc for ties
+    scored.sort(key=lambda x: (-round(x[1], 4), x[0]))  # Score desc, candidate_id asc for ties
 
     # Take top 100
     top100 = scored[:100]
